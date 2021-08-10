@@ -73,6 +73,8 @@ namespace webrtc
         }
     };
 
+    using StringMarshallArray = MarshallArray<char*>;
+
     template<typename T, typename U>
     void ConvertArray(const MarshallArray<T>& src, std::vector<U>& dst)
     {
@@ -1142,6 +1144,22 @@ extern "C"
             return *this;
         }
     };
+
+    struct RTCRtpTransceiverInit
+    {
+        RtpTransceiverDirection direction;
+        MarshallArray<char*> streamIds;
+        MarshallArray<RTCRtpEncodingParameters> sendEncodings;
+    };
+
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit2(PeerConnectionObject* obj, MediaStreamTrackInterface* track, RTCRtpTransceiverInit* rtcInit)
+    {
+        RtpTransceiverInit init;
+        init.direction = rtcInit->direction;
+        ConvertArray(rtcInit->streamIds, init.stream_ids);
+        ConvertArray(rtcInit->sendEncodings, init.send_encodings);
+        return obj->connection->AddTransceiver(track, init).value().get();
+    }
 
     UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, RTCRtpSendParameters** parameters)
     {

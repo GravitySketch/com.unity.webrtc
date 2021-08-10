@@ -178,4 +178,38 @@ namespace Unity.WebRTC
             length = 0;
         }
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct StringMarshallingArray
+    {
+        public int length;
+        public IntPtr ptr;
+
+        public string[] ToArray()
+        {
+            var array = ptr.AsArray<string>(length);
+            ptr = IntPtr.Zero;
+            return array;
+        }
+
+        public static implicit operator StringMarshallingArray(string[] src)
+        {
+            StringMarshallingArray dst = default;
+            dst.length = src.Length;
+            dst.ptr = src.ToPtr();
+            return dst;
+        }
+
+        public void Dispose()
+        {
+            IntPtr[] strings = ptr.AsArray<IntPtr>(length, false);
+            foreach (var s in strings)
+            {
+                Marshal.FreeCoTaskMem(s);
+            }
+            Marshal.FreeCoTaskMem(ptr);
+            ptr = IntPtr.Zero;
+            length = 0;
+        }
+    }
 }

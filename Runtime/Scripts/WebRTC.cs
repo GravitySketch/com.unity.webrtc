@@ -204,6 +204,54 @@ namespace Unity.WebRTC
         OAuth
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpTransceiverInitInternal
+    {
+        RTCRtpTransceiverDirection direction;
+        StringMarshallingArray streamIds;
+        MarshallingArray<RTCRtpEncodingParametersInternal> sendEncodings;
+
+        public static explicit operator RTCRtpTransceiverInitInternal(RTCRtpTransceiverInit init) => new RTCRtpTransceiverInitInternal
+        {
+            direction = init.Direction,
+            streamIds = (StringMarshallingArray) init.StreamIds,
+            sendEncodings = (MarshallingArray<RTCRtpEncodingParametersInternal>) Array.ConvertAll(init.SendEncodings, e => (RTCRtpEncodingParametersInternal) e)
+        };
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <seealso cref="RTCRtpTransceiver"/>
+    public struct RTCRtpTransceiverInit
+    {
+        public RTCRtpTransceiverDirection Direction;
+        public string[] StreamIds;
+        public RTCRtpEncodingParameters[] SendEncodings;
+    }
+
+// struct RTC_EXPORT RtpTransceiverInit final {
+//   RtpTransceiverInit();
+//   RtpTransceiverInit(const RtpTransceiverInit&);
+//   ~RtpTransceiverInit();
+//   // Direction of the RtpTransceiver. See RtpTransceiverInterface::direction().
+//   RtpTransceiverDirection direction = RtpTransceiverDirection::kSendRecv;
+//
+//   // The added RtpTransceiver will be added to these streams.
+//   std::vector<std::string> stream_ids;
+//
+//   // TODO(bugs.webrtc.org/7600): Not implemented.
+//   std::vector<RtpEncodingParameters> send_encodings;
+// };
+
+  // RtpTransceiverDirection direction = RtpTransceiverDirection::kSendRecv;
+
+  // // The added RtpTransceiver will be added to these streams.
+  // std::vector<std::string> stream_ids;
+
+  // // TODO(bugs.webrtc.org/7600): Not implemented.
+  // std::vector<RtpEncodingParameters> send_encodings;
+
     /// <summary>
     ///
     /// </summary>
@@ -878,6 +926,8 @@ namespace Unity.WebRTC
         public static extern IntPtr PeerConnectionAddTrack(IntPtr pc, IntPtr track, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string streamId);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionAddTransceiverWithInit2(IntPtr pc, IntPtr track, ref RTCRtpTransceiverInitInternal init);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind);
         [DllImport(WebRTC.Lib)]

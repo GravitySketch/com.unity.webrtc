@@ -12,6 +12,10 @@ namespace Unity.WebRTC
         public double? scaleResolutionDownBy;
         public string rid;
 
+        public RTCRtpEncodingParameters()
+        {
+        }
+
         internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)
         {
             active = parameter.active;
@@ -287,5 +291,15 @@ namespace Unity.WebRTC
         public OptionalUint maxFramerate;
         public OptionalDouble scaleResolutionDownBy;
         public IntPtr rid;
+
+        public static explicit operator RTCRtpEncodingParametersInternal(RTCRtpEncodingParameters parameter) => new RTCRtpEncodingParametersInternal
+        {
+            active = parameter.active,
+            maxBitrate = parameter.maxBitrate,
+            minBitrate = parameter.minBitrate,
+            maxFramerate = parameter.maxFramerate,
+            scaleResolutionDownBy = parameter.scaleResolutionDownBy,
+            rid = string.IsNullOrEmpty(parameter.rid) ? IntPtr.Zero : Marshal.StringToCoTaskMemAnsi(parameter.rid)
+        };
     }
 }

@@ -567,6 +567,19 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
+        public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track, RTCRtpTransceiverInit rtcInit)
+        {
+            var init = (RTCRtpTransceiverInitInternal) rtcInit;
+            IntPtr ptr = NativeMethods.PeerConnectionAddTransceiverWithInit2(
+                GetSelfOrThrow(), track.GetSelfOrThrow(), ref init);
+            return CreateTransceiver(ptr);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(TrackKind kind)
@@ -835,6 +848,12 @@ namespace Unity.WebRTC
                 }
                 throw new InvalidOperationException("CurrentLocalDescription is not exist");
             }
+        }
+
+        public bool HasRemoteDescription()
+        {
+                RTCSessionDescription desc = default;
+                return NativeMethods.PeerConnectionGetCurrentRemoteDescription(GetSelfOrThrow(), ref desc);
         }
 
         public RTCSessionDescription CurrentRemoteDescription
