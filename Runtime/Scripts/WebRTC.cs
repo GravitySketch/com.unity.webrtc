@@ -437,7 +437,10 @@ namespace Unity.WebRTC
 #endif
             s_context = Context.Create(encoderType:type, forTest:forTest);
             NativeMethods.SetCurrentContext(s_context.self);
-            s_syncContext = SynchronizationContext.Current;
+
+            // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
+            s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+            
             var flipShader = Resources.Load<Shader>("Flip");
             if (flipShader != null)
             {
@@ -473,6 +476,26 @@ namespace Unity.WebRTC
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes any pending tasks generated asynchronously during the WebRTC runtime.
+        /// </summary>
+        /// <param name="millisecondTimeout">
+        /// The amount of time in milliseconds that the task queue can take before task execution will cease.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if all pending tasks were completed within <see cref="millisecondTimeout"/> milliseconds and <c>false</c>
+        /// otherwise.
+        /// </returns>
+        public static bool ExecutePendingTasks(int millisecondTimeout)
+        {
+            if (s_syncContext is ExecutableUnitySynchronizationContext executableContext)
+            {
+                return executableContext.ExecutePendingTasks(millisecondTimeout);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -713,7 +736,9 @@ namespace Unity.WebRTC
         {
             if (Context.table.ContainsKey(ptr))
             {
-                return Context.table[ptr] as T;
+                if(Context.table[ptr] is T value)
+                    return value;
+                throw new InvalidCastException($"{ptr} is not {typeof(T).Name}");
             }
             else
             {
@@ -931,7 +956,7 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetCurrentRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionAddTrack(IntPtr pc, IntPtr track, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string streamId);
+        public static extern RTCErrorType PeerConnectionAddTrack(IntPtr pc, IntPtr track, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string streamId, out IntPtr sender);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiver(IntPtr context, IntPtr pc, IntPtr track);
         [DllImport(WebRTC.Lib)]
@@ -984,7 +1009,7 @@ namespace Unity.WebRTC
         public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool TransceiverStop(IntPtr transceiver);
+        public static extern RTCErrorType TransceiverStop(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern RTCRtpTransceiverDirection TransceiverGetDirection(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
