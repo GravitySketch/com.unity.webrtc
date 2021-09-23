@@ -1,10 +1,34 @@
 #include "pch.h"
 #include "AudioTrackSinkAdapter.h"
 
+#include "W32AudioPlayer.h"
+
 namespace unity
 {
 namespace webrtc
 {
+    W32AudioPlayerAudioTrackSinkAdapter::W32AudioPlayerAudioTrackSinkAdapter(webrtc::AudioTrackInterface* track)
+        : _track(track)
+        , _audioPlayer(std::make_unique<W32AudioPlayer>())
+    {
+    }
+
+    void W32AudioPlayerAudioTrackSinkAdapter::OnData(
+       const void* audio_data,
+       int bits_per_sample,
+       int sample_rate,
+       size_t number_of_channels,
+       size_t number_of_frames)
+    {
+        if (!_audioPlayer->IsInitialized())
+        {
+            _audioPlayer->Init(number_of_channels, bits_per_sample, sample_rate);
+        }
+
+        _audioPlayer->PlayAudioFrame(audio_data, bits_per_sample, sample_rate, number_of_channels, number_of_frames);
+    }
+
+
     AudioTrackSinkAdapter::AudioTrackSinkAdapter(
         webrtc::AudioTrackInterface* track, DelegateAudioReceive callback)
         : _track(track)

@@ -1,3 +1,4 @@
+#include "W32AudioPlayer.h"
 #include "pch.h"
 #include "WebRTCPlugin.h"
 #include "Context.h"
@@ -415,6 +416,13 @@ namespace webrtc
         return track;
     }
 
+
+    void Context::BindW32AudioPlayerToTrack(AudioTrackInterface* track)
+    {
+        // This is throw away code so the leak doesn't really matter.
+        W32AudioPlayerAudioTrackSinkAdapter* sink = new W32AudioPlayerAudioTrackSinkAdapter(track);
+        track->AddSink(sink);
+    }
 
     void Context::RegisterAudioReceiveCallback(
         AudioTrackInterface* track, DelegateAudioReceive callback)

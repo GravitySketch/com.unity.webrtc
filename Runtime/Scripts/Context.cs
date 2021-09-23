@@ -203,6 +203,11 @@ namespace Unity.WebRTC
             NativeMethods.ContextRegisterAudioReceiveCallback(self, track, callback);
         }
 
+        public void AudioTrackBindW32AudioPlayer(IntPtr track)
+        {
+            NativeMethods.ContextBindW32AudioPlayerToTrack(self, track);
+        }
+
         public void AudioTrackUnregisterAudioReceiveCallback(IntPtr track)
         {
             NativeMethods.ContextUnregisterAudioReceiveCallback(self, track);

@@ -1402,6 +1402,11 @@ extern "C"
     }
 
 
+    UNITY_INTERFACE_EXPORT void ContextBindW32AudioPlayerToTrack(Context* ctx, AudioTrackInterface* track)
+    {
+        ctx->BindW32AudioPlayerToTrack(track);
+    }
+
     UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(
         Context* context, AudioTrackInterface* track, DelegateAudioReceive callback)
     {

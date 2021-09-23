@@ -1074,6 +1074,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextRegisterAudioReceiveCallback(IntPtr context, IntPtr track, DelegateAudioReceive callback);
         [DllImport(WebRTC.Lib)]
+        public static extern void ContextBindW32AudioPlayerToTrack(IntPtr ctx, IntPtr track);
+        [DllImport(WebRTC.Lib)]
         public static extern void ContextUnregisterAudioReceiveCallback(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);

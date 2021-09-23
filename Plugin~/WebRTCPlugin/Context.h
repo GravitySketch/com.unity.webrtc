@@ -102,6 +102,7 @@ namespace webrtc
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
 
+        void BindW32AudioPlayerToTrack(AudioTrackInterface* track);
         void RegisterAudioReceiveCallback(
             AudioTrackInterface* track, DelegateAudioReceive callback);
         void UnregisterAudioReceiveCallback(AudioTrackInterface* track);

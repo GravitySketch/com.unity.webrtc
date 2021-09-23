@@ -16,6 +16,8 @@ namespace Unity.WebRTC
     /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
     {
+        private bool _boundToNativePlayer = false;
+
         /// <summary>
         ///
         /// </summary>
@@ -172,6 +174,16 @@ namespace Unity.WebRTC
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
             }
             base.Dispose();
+        }
+
+        public void BindW32AudioPlayer()
+        {
+            if (_boundToNativePlayer)
+            {
+                Debug.LogError("Attempt to multiply bind this track to the native audio player.");
+            }
+            _boundToNativePlayer = true;
+            WebRTC.Context.AudioTrackBindW32AudioPlayer(self);
         }
 
 #if UNITY_2020_1_OR_NEWER
